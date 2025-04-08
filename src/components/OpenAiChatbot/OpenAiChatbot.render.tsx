@@ -1,18 +1,34 @@
-import { useRenderer } from '@ws-ui/webform-editor';
+import { useRenderer, useSources } from '@ws-ui/webform-editor';
 import cn from 'classnames';
-import { FC, useState } from 'react';
+import { FC, useState, useEffect } from 'react';
 import { LuMessageCircle } from 'react-icons/lu';
 import { IoClose } from 'react-icons/io5';
 
 import { IOpenAiChatbotProps } from './OpenAiChatbot.config';
 
-const OpenAiChatbot: FC<IOpenAiChatbotProps> = ({ apiKey, style, className, classNames = [] }) => {
+const OpenAiChatbot: FC<IOpenAiChatbotProps> = ({ style, className, classNames = [] }) => {
   const { connect } = useRenderer();
+  const [apiKey, setApiKey] = useState<string>(''); //name of the connected user
+  const {
+    sources: { datasource: ds },
+  } = useSources();
 
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<{ sender: 'user' | 'bot'; text: string }[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    if (!ds) return;
+    const listener = async (/* event */) => {
+      const v = await ds.getValue();
+      setApiKey(v);
+    };
+    listener();
+    ds.addListener('changed', listener);
+    return () => {
+      ds.removeListener('changed', listener);
+    };
+  }, []);
 
   const sendMessage = async () => {
     if (!input.trim()) return;

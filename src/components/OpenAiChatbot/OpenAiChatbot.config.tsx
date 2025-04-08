@@ -56,11 +56,7 @@ export default {
       accept: ['string'],
     },
   },
-  defaultProps: {
-    name: 'Qodly',
-  },
+  defaultProps: {},
 } as T4DComponentConfig<IOpenAiChatbotProps>;
 
-export interface IOpenAiChatbotProps extends webforms.ComponentProps {
-  apiKey?: string;
-}
+export interface IOpenAiChatbotProps extends webforms.ComponentProps {}

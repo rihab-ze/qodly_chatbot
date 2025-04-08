@@ -62,5 +62,5 @@ export default {
 } as T4DComponentConfig<IOpenAiChatbotProps>;
 
 export interface IOpenAiChatbotProps extends webforms.ComponentProps {
-  name?: string;
+  apiKey?: string;
 }

@@ -3,10 +3,9 @@ import { BASIC_SETTINGS, DEFAULT_SETTINGS, load } from '@ws-ui/webform-editor';
 
 const commonSettings: TSetting[] = [
   {
-    key: 'name',
-    label: 'Name',
+    key: 'apiKey',
+    label: 'apiKey',
     type: ESetting.TEXT_FIELD,
-    defaultValue: 'Qodly',
   },
 ];
 

@@ -53,10 +53,12 @@ export default {
       },
     ],
     datasources: {
-      accept: ['string'],
+      accept: ['blob'],
     },
   },
   defaultProps: {},
 } as T4DComponentConfig<IOpenAiChatbotProps>;
 
-export interface IOpenAiChatbotProps extends webforms.ComponentProps {}
+export interface IOpenAiChatbotProps extends webforms.ComponentProps {
+  apiKey: string;
+}

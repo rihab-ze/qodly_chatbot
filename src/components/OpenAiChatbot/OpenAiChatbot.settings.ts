@@ -1,14 +1,46 @@
-import {  TSetting } from '@ws-ui/webform-editor';
+import {   ESetting, TSetting } from '@ws-ui/webform-editor';
 import { BASIC_SETTINGS, DEFAULT_SETTINGS, load } from '@ws-ui/webform-editor';
 
-
-
-const Settings: TSetting[] = [
+const commonSettings: TSetting[] = [
+  {
+    key: 'apiKey',
+    label: 'API Key',
+    type: ESetting.TEXT_FIELD,
+    defaultValue: '',
+  },
+];
+const dataAccessSettings: TSetting[] = [
+  {
+    key: 'datasource',
+    label: 'Qodly Source',
+    type: ESetting.DS_AUTO_SUGGEST,
+  },
+  {
+    key: 'serverSideRef',
+    label: 'Server Side',
+    type: ESetting.TEXT_FIELD,
+    validateOnEnter: true,
+  },
+];
  
-  ...DEFAULT_SETTINGS,
+const Settings: TSetting[] = [
+  {
+    key: 'properties',
+    label: 'Properties',
+    type: ESetting.GROUP,
+    components: commonSettings,
+  },{
+    key: 'dataAccess',
+    label: 'Data Access',
+    type: ESetting.GROUP,
+    components: dataAccessSettings,
+  },
+ 
+  ...load(DEFAULT_SETTINGS).filter('dataAccess'),
 ];
 
 export const BasicSettings: TSetting[] = [
+  ...commonSettings,
   ...load(BASIC_SETTINGS).filter('style.overflow'),
 ];
 

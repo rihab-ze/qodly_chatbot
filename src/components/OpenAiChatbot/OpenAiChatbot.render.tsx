@@ -1,14 +1,14 @@
 import { useRenderer, useSources } from '@ws-ui/webform-editor';
 import cn from 'classnames';
-import { FC, useState, useEffect } from 'react';
+import { FC, useState, useEffect, useRef } from 'react';
 import { LuMessageCircle } from 'react-icons/lu';
 import { IoClose } from 'react-icons/io5';
 
 import { IOpenAiChatbotProps } from './OpenAiChatbot.config';
 
-const OpenAiChatbot: FC<IOpenAiChatbotProps> = ({ style, className, classNames = [] }) => {
+const OpenAiChatbot: FC<IOpenAiChatbotProps> = ({ style, apiKey, className, classNames = [] }) => {
   const { connect } = useRenderer();
-  const [apiKey, setApiKey] = useState<string>(''); //name of the connected user
+  const [file, setFile] = useState<any>(); //name of the connected user
   const {
     sources: { datasource: ds },
   } = useSources();
@@ -16,12 +16,13 @@ const OpenAiChatbot: FC<IOpenAiChatbotProps> = ({ style, className, classNames =
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<{ sender: 'user' | 'bot'; text: string }[]>([]);
   const [input, setInput] = useState('');
+  const dataContent = useRef<any>(null);
   const [loading, setLoading] = useState(false);
   useEffect(() => {
     if (!ds) return;
     const listener = async (/* event */) => {
       const v = await ds.getValue();
-      setApiKey(v);
+      setFile(v);
     };
     listener();
     ds.addListener('changed', listener);
@@ -29,6 +30,23 @@ const OpenAiChatbot: FC<IOpenAiChatbotProps> = ({ style, className, classNames =
       ds.removeListener('changed', listener);
     };
   }, []);
+
+  useEffect(() => {
+    const getContent = async () => {
+      if (!file) return;
+      try {
+        const val = JSON.parse(file);
+        const resp = await fetch(val.__deferred.uri);
+        const arrayBuffer = await resp.arrayBuffer();
+        const blob = new Blob([arrayBuffer]);
+        dataContent.current = await blob.text();
+      } catch (error) {
+        console.error('Error fetching PDF:', error);
+      }
+    };
+
+    getContent();
+  }, [file]);
 
   const sendMessage = async () => {
     if (!input.trim()) return;
@@ -50,7 +68,10 @@ const OpenAiChatbot: FC<IOpenAiChatbotProps> = ({ style, className, classNames =
         },
         body: JSON.stringify({
           model: 'gpt-3.5-turbo',
-          messages: [{ role: 'user', content: input }],
+          messages: [
+            { role: 'system', content: 'Answer based on the context.' },
+            { role: 'user', content: `Document:\n${dataContent}\n\nQuestion: ${input}` },
+          ],
         }),
       });
 
